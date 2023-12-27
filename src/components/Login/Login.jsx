@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Login.css";
 import { useContext, useState } from "react";
 import { AuthContext } from "../Context/AuthProvider";
@@ -7,6 +7,12 @@ import { AuthContext } from "../Context/AuthProvider";
 const Login = () => {
     const [error, setError] = useState(null);
     const { signIn } = useContext(AuthContext);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    // console.log(location);
+
+    const from = location.state?.from?.pathname || "/";
 
     const handleLogin = (event) => {
         event.preventDefault();
@@ -18,12 +24,14 @@ const Login = () => {
             .then(result => {
                 const loggedUser = result.user;
                 console.log(loggedUser);
+                form.reset();
+                navigate(from, {replace: true});
             })
             .catch(error => {
                 console.log(error);
                 setError(error);
             })
-            form.reset();
+            
     }
 
     return (
@@ -41,7 +49,7 @@ const Login = () => {
                 <input className="btn-submit" type="submit" value="Login" />
             </form>
             <p><small className="signup-login-toggle">New to Ema-john? <Link to={"/signup"}>Create a new account</Link></small></p>
-            <p>{error}</p>
+            <p>{error && error.message}</p>
         </div>
     );
 };
